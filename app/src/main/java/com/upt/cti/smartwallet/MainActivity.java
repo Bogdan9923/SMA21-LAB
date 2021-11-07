@@ -18,7 +18,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity<DatabaseReference> extends AppCompatActivity {
 
-    private Button searchButton;
+    private Button searchButton, updateButton;
     private TextView tStatus;
     private EditText eSearch, eIncome, eExpenses;
     private String currentMonth;
@@ -36,10 +36,11 @@ public class MainActivity<DatabaseReference> extends AppCompatActivity {
         eIncome = (EditText) findViewById(R.id.income_box);
         eExpenses = (EditText) findViewById(R.id.expenses_box);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-
+        FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-wallet-9a2f3-default-rtdb.europe-west1.firebasedatabase.app");
+        databaseReference =  database.getReference();
 
         searchButton = (Button) findViewById(R.id.search_button);
+        updateButton = (Button) findViewById(R.id.update_button);
 
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,7 +48,7 @@ public class MainActivity<DatabaseReference> extends AppCompatActivity {
                 if (!eSearch.getText().toString().isEmpty()) {
                     // save text to lower case (all our months are stored online in lower case)
                     currentMonth = eSearch.getText().toString().toLowerCase();
-                    databaseReference =  database.getReference().child("calendar").child(currentMonth);
+              /*      databaseReference =  database.getReference().child("calendar").child(currentMonth);
 
                     databaseReference.addValueEventListener(new ValueEventListener() {
                         @Override
@@ -68,9 +69,46 @@ public class MainActivity<DatabaseReference> extends AppCompatActivity {
 
                         }
                     });
-
+*/
                     tStatus.setText("Searching...");
-                    //createNewDBListener();
+                    createNewDBListener();
+                } else {
+
+                    Toast.makeText(MainActivity.this, "Search field may not be empty", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!eSearch.getText().toString().isEmpty()) {
+
+                    if(!eIncome.getText().toString().isEmpty() && !eExpenses.getText().toString().isEmpty())
+                    {
+
+                        databaseReference =  database.getReference().child("calendar").child(currentMonth);
+
+                        float newIncome=0,newExpenses=0;
+                        try{
+                            newIncome = Float.parseFloat(eIncome.getText().toString());
+                        }catch(NumberFormatException e){
+                            databaseReference.child("income").setValue(0);
+                        }
+
+                        try{
+                            newExpenses = Float.parseFloat(eExpenses.getText().toString());
+                        }catch(NumberFormatException e){
+
+                            databaseReference.child("expenses").setValue(0);
+                        }
+
+                        databaseReference.child("expenses").setValue(newExpenses);
+                        databaseReference.child("income").setValue(newIncome);
+
+
+                    }
+
                 } else {
 
                     Toast.makeText(MainActivity.this, "Search field may not be empty", Toast.LENGTH_SHORT).show();
