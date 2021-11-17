@@ -7,31 +7,6 @@
     tools:context=".MainActivity">
 
 
-    <Button
-        android:id="@+id/search_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginStart="155dp"
-        android:layout_marginTop="521dp"
-        android:text="Search"
-        android:visibility="visible"
-        app:backgroundTint="#676767" />
-
-    <EditText
-        android:id="@+id/month_box"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginStart="45dp"
-        android:layout_marginBottom="21dp"
-        android:ems="10"
-        android:hint="Month"
-        android:inputType="textPersonName" />
-
     <TextView
         android:id="@+id/textView"
         android:layout_width="wrap_content"
@@ -93,4 +68,14 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="10dp"
         android:layout_marginTop="17dp" />
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="338dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="34dp"
+        android:layout_marginTop="321dp" />
 </RelativeLayout>

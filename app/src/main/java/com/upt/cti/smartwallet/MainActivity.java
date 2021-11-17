@@ -5,8 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,6 +19,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 public class MainActivity<DatabaseReference> extends AppCompatActivity {
 
     private Button searchButton, updateButton;
@@ -23,6 +28,10 @@ public class MainActivity<DatabaseReference> extends AppCompatActivity {
     private EditText eSearch, eIncome, eExpenses;
     private String currentMonth;
     private ValueEventListener databaseListener = null;
+    private Spinner spinner;
+    ArrayAdapter<String> adapter;
+    ArrayList<String> spinnerDataList;
+
 
     private com.google.firebase.database.DatabaseReference databaseReference;
 
@@ -32,51 +41,34 @@ public class MainActivity<DatabaseReference> extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         tStatus = (TextView) findViewById(R.id.message_box);
-        eSearch = (EditText) findViewById(R.id.month_box);
         eIncome = (EditText) findViewById(R.id.income_box);
         eExpenses = (EditText) findViewById(R.id.expenses_box);
+        spinner = (Spinner) findViewById(R.id.spinner);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-wallet-9a2f3-default-rtdb.europe-west1.firebasedatabase.app");
         databaseReference =  database.getReference();
 
-        searchButton = (Button) findViewById(R.id.search_button);
+        spinnerDataList = new ArrayList<>();
+        adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item,spinnerDataList);
+
         updateButton = (Button) findViewById(R.id.update_button);
+        spinner.setAdapter(adapter);
+        retrieveMonth();
 
-        searchButton.setOnClickListener(new View.OnClickListener() {
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onClick(View v) {
-                if (!eSearch.getText().toString().isEmpty()) {
-                    // save text to lower case (all our months are stored online in lower case)
-                    currentMonth = eSearch.getText().toString().toLowerCase();
-              /*      databaseReference =  database.getReference().child("calendar").child(currentMonth);
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
-                    databaseReference.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                            //MonthlyExpenses monthlyExpense = snapshot.getValue(MonthlyExpenses.class);
-                            // explicit mapping of month name from entry key
-                           // monthlyExpense.month = snapshot.getKey();
-
-                            eIncome.setText(snapshot.child("income").getValue().toString());
-                            eExpenses.setText(snapshot.child("expenses").getValue().toString());
-                            tStatus.setText("Found entry for " + currentMonth);
-
-                        }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-*/
-                    tStatus.setText("Searching...");
-                    createNewDBListener();
-                } else {
-
-                    Toast.makeText(MainActivity.this, "Search field may not be empty", Toast.LENGTH_SHORT).show();
-                }
+                System.out.println(spinner.getItemAtPosition(position).toString());
+                currentMonth = spinner.getItemAtPosition(position).toString();
+                createNewDBListener();
             }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
         });
 
         updateButton.setOnClickListener(new View.OnClickListener() {
@@ -86,6 +78,9 @@ public class MainActivity<DatabaseReference> extends AppCompatActivity {
 
                     if(!eIncome.getText().toString().isEmpty() && !eExpenses.getText().toString().isEmpty())
                     {
+
+                        if (databaseReference != null && currentMonth != null && databaseListener != null)
+                            databaseReference.child("calendar").child(currentMonth).removeEventListener(databaseListener);
 
                         databaseReference =  database.getReference().child("calendar").child(currentMonth);
 
@@ -118,6 +113,30 @@ public class MainActivity<DatabaseReference> extends AppCompatActivity {
 
     }
 
+    public void retrieveMonth()
+    {
+
+
+        databaseListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot item : snapshot.getChildren()){
+
+                    spinnerDataList.add(item.getKey().toString());
+                    System.out.println(item.getKey().toString());
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+
+        databaseReference.child("calendar").addValueEventListener(databaseListener);
+    }
 
     private void createNewDBListener() {
         // remove previous databaseListener
