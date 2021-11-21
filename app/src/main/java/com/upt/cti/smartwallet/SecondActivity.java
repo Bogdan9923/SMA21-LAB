@@ -18,11 +18,11 @@ public class SecondActivity extends AppCompatActivity {
 
 
     private ListView listView;
-    private ArrayAdapter<PaymentType> adapter;
-    private ArrayList<PaymentType> list;
+
+    private ArrayList<Payment> list;
     private com.google.firebase.database.DatabaseReference databaseReference;
     private ValueEventListener databaseListener = null;
-    PaymentType payment;
+    Payment payment;
     FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-wallet-9a2f3-default-rtdb.europe-west1.firebasedatabase.app");
 
     @Override
@@ -31,19 +31,19 @@ public class SecondActivity extends AppCompatActivity {
         setContentView(R.layout.activity_second);
 
         listView = (ListView) findViewById(R.id.listPayments);
-        databaseReference = database.getReference("Wallet");
+        databaseReference = database.getReference().child("wallet");
 
         list = new ArrayList<>();
-        adapter = new ArrayAdapter<PaymentType>(this,R.layout.parent_item,R.id.lHeader,list);
+        final PaymentAdapter adapter = new PaymentAdapter(this, R.layout.parent_item, list);
 
-        payment = new PaymentType();
+        payment = new Payment();
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot ds: snapshot.getChildren())
                 {
-                    payment = ds.getValue(PaymentType.class);
+                    payment = ds.getValue(Payment.class);
                     list.add(payment);
                 }
                 listView.setAdapter(adapter);
