@@ -3,6 +3,9 @@ package com.upt.cti.smartwallet;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -70,6 +73,11 @@ public class MainActivity<DatabaseReference> extends AppCompatActivity {
             }
 
         });
+
+        if (!AppState.isNetworkAvailable(this)) {
+            // has local storage already
+
+        }
 
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,5 +174,7 @@ public class MainActivity<DatabaseReference> extends AppCompatActivity {
         // set new databaseListener
         databaseReference.child("calendar").child(currentMonth).addValueEventListener(databaseListener);
     }
+
+
 
 }
