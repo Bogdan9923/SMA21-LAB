@@ -51,6 +51,8 @@ public class MainActivity<DatabaseReference> extends AppCompatActivity {
         FirebaseDatabase database = FirebaseDatabase.getInstance("https://smart-wallet-9a2f3-default-rtdb.europe-west1.firebasedatabase.app");
         databaseReference =  database.getReference();
 
+        databaseReference.child("calendar").keepSynced(true); //sync firebase into offline mode
+
         spinnerDataList = new ArrayList<>();
         adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item,spinnerDataList);
 
